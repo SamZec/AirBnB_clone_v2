@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<HTML lang="en">
+    <HEAD>
+        <TITLE>HBNB</TITLE>
+    </HEAD>
+    <BODY>
+
+{#+ no id passed in #}
+	{% if input_id == "no_id" %}
+
+        <H1>States</H1>
+	<UL>
+	  {% for state in state_list|sort(attribute='name') %}
+
+	    <LI>{{state.id}}: <B>{{state.name}}</B></LI>
+
+	  {% endfor %}
+	</UL>
+
+{# find id in state_list #}
+	{% elif input_id in state_id_list %}
+
+	{% for state in state_list %}
+	  {% if input_id == state.id %}
+	  <H1>State: {{state.name}}</H1>
+	  <H3>Cities:</H3>
+	  <UL>
+                    {% for city in city_list|sort(attribute='name') -%}
+                    {% if city.state_id == state.id %}
+
+                    <LI>{{city.id}}: <B>{{city.name}}</B></LI>
+
+                    {% endif %}
+                    {%- endfor %}
+	  </UL>
+	  {% endif %}
+	{% endfor %}
+
+{# id not in state list #}
+	{% else %}
+	<H1>Not found!</H1>
+
+	{% endif %}
+    </BODY>
+</HTML>
