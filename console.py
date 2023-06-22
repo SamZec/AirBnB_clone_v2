@@ -5,8 +5,7 @@
 import cmd
 import json
 import shlex
-from models.engine.file_storage import FileStorage
-from models.engine.db_storage import DBStorage
+from models import storage
 from models.base_model import BaseModel
 from models.user import User
 from models.place import Place
@@ -14,7 +13,7 @@ from models.state import State
 from models.city import City
 from models.amenity import Amenity
 from models.review import Review
-import models
+
 
 class HBNBCommand(cmd.Cmd):
     '''
@@ -22,6 +21,7 @@ class HBNBCommand(cmd.Cmd):
     '''
 
     prompt = ("(hbnb) ")
+
     def do_quit(self, args):
         '''
             Quit command to exit the program.
@@ -42,33 +42,26 @@ class HBNBCommand(cmd.Cmd):
         if len(args) == 0:
             print("** class name missing **")
             return
-        elif len(args) == 1:
-            try:
-                args = shlex.split(args)
-                new_instance = eval(args[0])()
-                new_instance.save()
-                print(new_instance.id)
+        try:
+            args = shlex.split(args)
+            new_instance = eval(args[0])()
+            if len(args) > 1:
+                my_dict = dict(arg.split('=') for arg in args[1:])
+                for key, value in my_dict.items():
+                    if hasattr(new_instance, key):
+                        if '_' in value:
+                            value = value.replace('_', ' ')
+                            try:
+                                value = eval(value)
+                            except Exception:
+                                pass
+                        setattr(new_instance, key, value)
+            new_instance.save()
+            print(new_instance.id)
 
-            except:
-                print("** class doesn't exist **")
-        else:
-            try:
-                args = shlex.split(args)
-                name = args.pop(0)
-                obj = eval(name)()
-                for arg in args:
-                    arg = arg.split('=')
-                    if hasattr(obj, arg[0]):
-                        try:
-                            arg[1] = eval(arg[1])
-                        except:
-                            arg[1] = arg[1].replace('_',' ')
-                        setattr(obj, arg[0], arg[1])
+        except Exception:
+            print("** class doesn't exist **")
 
-                obj.save()
-            except:
-                return
-            print(obj.id)
     def do_show(self, args):
         '''
             Print the string representation of an instance baed on
@@ -81,9 +74,8 @@ class HBNBCommand(cmd.Cmd):
         if len(args) == 1:
             print("** instance id missing **")
             return
-        #
-        models.storage.reload()
-        obj_dict = models.storage.all()
+        storage.reload()
+        obj_dict = storage.all()
         try:
             eval(args[0])
         except NameError:
@@ -110,9 +102,8 @@ class HBNBCommand(cmd.Cmd):
             return
         class_name = args[0]
         class_id = args[1]
-        #
-        models.storage.reload()
-        obj_dict = models.storage.all()
+        storage.reload()
+        obj_dict = storage.all()
         try:
             eval(class_name)
         except NameError:
@@ -123,7 +114,7 @@ class HBNBCommand(cmd.Cmd):
             del obj_dict[key]
         except KeyError:
             print("** no instance found **")
-        models.storage.save()
+        storage.save()
 
     def do_all(self, args):
         '''
@@ -131,9 +122,8 @@ class HBNBCommand(cmd.Cmd):
             based or not on the class name.
         '''
         obj_list = []
-        #
-        models.storage.reload()
-        objects = models.storage.all()
+        storage.reload()
+        objects = storage.all()
         try:
             if len(args) != 0:
                 eval(args)
@@ -154,8 +144,7 @@ class HBNBCommand(cmd.Cmd):
             Update an instance based on the class name and id
             sent as args.
         '''
-        #
-        models.storage.reload()
+        storage.reload()
         args = shlex.split(args)
         if len(args) == 0:
             print("** class name missing **")
@@ -175,7 +164,7 @@ class HBNBCommand(cmd.Cmd):
             print("** class doesn't exist **")
             return
         key = args[0] + "." + args[1]
-        obj_dict = models.storage.all()
+        obj_dict = storage.all()
         try:
             obj_value = obj_dict[key]
         except KeyError:
@@ -200,9 +189,8 @@ class HBNBCommand(cmd.Cmd):
             Counts/retrieves the number of instances.
         '''
         obj_list = []
-        #
-        models.storage.reload()
-        objects = models.storage.all()
+        storage.reload()
+        objects = storage.all()
         try:
             if len(args) != 0:
                 eval(args)
@@ -231,7 +219,7 @@ class HBNBCommand(cmd.Cmd):
             cmd_arg = args[0] + " " + args[2]
             func = functions[args[1]]
             func(cmd_arg)
-        except:
+        except Exception:
             print("*** Unknown syntax:", args[0])
 
 
