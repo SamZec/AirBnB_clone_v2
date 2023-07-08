@@ -19,8 +19,8 @@ filename = "web_static_{}{}{}{}{}{}".format(year, month,
                                             day, hour, minute, second)
 command = "tar -cvzf versions/{}.tgz web_static".format(filename)
 
-env.hosts = ['ubuntu@35.190.155.240', 'ubuntu@104.196.65.224']
-env.key_filename = "~/.ssh/holberton"
+env.hosts = ['ubuntu@52.201.222.10', 'ubuntu@34.232.70.226']
+env.key_filename = "~/.ssh/id_rsa.pub"
 file_path = "versions/" + filename + ".tgz"
 
 
