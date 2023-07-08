@@ -3,26 +3,18 @@
 
 from fabric.api import local
 from datetime import datetime
-from pathlib import Path
-
-time = datetime.now()
-year = time.strftime("%Y")
-month = time.month
-day = time.day
-hour = time.hour
-minute = time.minute
-second = time.second
-filename = "web_static_{}{}{}{}{}{}".format(year, month,
-                                            day, hour, minute, second)
-command = "tar -cvzf versions/{}.tgz web_static".format(filename)
+import os.path
 
 
 def do_pack():
-    """creates an archive"""
-    local("mkdir -p versions")
-    local(command)
-    my_file = Path("versions/{}.tgz".format(filename))
-    if my_file.is_file():
-        return "versions/{}.tgz".format(filename)
-    else:
-        return None
+    """
+    generate tgz archive using fabric
+    """
+    date = datetime.now().strftime("%Y%m%d%H%M%S")
+    file_path = "versions/web_static_{}.tgz".format(date)
+    if os.path.isdir("versions") is False:
+        local(" mkdir versions")
+    local('tar -cvzf ' + file_path + ' web_static')
+    if os.path.exists(file_path):
+        return file_path
+    return None
