@@ -1,9 +1,11 @@
 #!/usr/bin/python3
-"""Flask web app"""
+"""a script that starts a Flask web application"""
 
 from flask import Flask
 from flask import render_template
 from models import storage
+from models.state import State
+from models.city import City
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -62,7 +64,7 @@ def number_odd_or_even(n):
 def states_list():
     """prints states"""
     all_states_list = []
-    all_states_dict = storage.all("State")
+    all_states_dict = storage.all(State)
     for key, value in all_states_dict.items():
         all_states_list.append(value)
     return render_template('7-states_list.html', objects_list=all_states_list)
@@ -78,8 +80,8 @@ def city_by_states_list():
     """prints cities by states"""
     states_list = []
     cities_list = []
-    all_states_dict = storage.all("State")
-    all_cities_dict = storage.all("City")
+    all_states_dict = storage.all(State)
+    all_cities_dict = storage.all(City)
     for key, value in all_states_dict.items():
         states_list.append(value)
     for key, value in all_cities_dict.items():
