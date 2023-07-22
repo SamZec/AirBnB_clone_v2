@@ -14,15 +14,11 @@ class State(BaseModel, Base):
         Implementation for the State.
     '''
     __tablename__ = "states"
-    name = Column(String(128), nullable=False)
-    cities = relationship("City", backref="state", cascade="all, delete")
-
-    def __init__(self, *args, **kwargs):
-        """
-            Init for inherited
-        """
-        super().__init__(*args, **kwargs)
-    if getenv('HBNB_TYPE_STORAGE') != db:
+    if getenv("HBNB_TYPE_STORAGE") == "db":
+        name = Column(String(128), nullable=False)
+        cities = relationship("City", backref="state",
+                              cascade="all, delete-orphan")
+    else:
         @property
         def cities(self):
             """This is the property setter for cities
