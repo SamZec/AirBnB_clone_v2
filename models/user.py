@@ -20,3 +20,9 @@ class User(BaseModel, Base):
                           cascade="all, delete-orphan")
     reviews = relationship("Review", backref="user",
                            cascade="all, delete-orphan")
+
+    def __init__(self, *args, **kwargs):
+        """
+            Init for inherited
+        """
+        super().__init__(*args, **kwargs)
