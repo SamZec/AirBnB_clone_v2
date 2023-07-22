@@ -3,12 +3,14 @@
     Define the class Place.
 '''
 from models.base_model import BaseModel, Base
+from models.amenity import Amenity
+from models.review import Review
 from sqlalchemy import Column, String, Integer, Float, ForeignKey, Table
 from sqlalchemy.orm import relationship
 from os import getenv
 import models
 
-place_amenity = Table(
+association_table = Table(
     "place_amenity", Base.metadata,
     Column("place_id", String(60), ForeignKey("places.id"),
            primary_key=True, nullable=False),
@@ -34,19 +36,23 @@ class Place(BaseModel, Base):
     amenity_ids = []
     reviews = relationship("Review", backref="place",
                            cascade="all, delete-orphan")
-    amenities = relationship("Amenity ", secondary=place_amenity,
-                             viewonly=False)
+    amenities = relationship("Amenity", secondary='place_amenity',
+                             viewonly=True)
 
-    @property
-    def reviews(self):
-        """This is the property setter for reviews
-        Return:
-            all object in list
-        """
-        get_all = models.storage.all("Review").values()
-        return [obj for obj in get_all if obj.place_id == self.id]
+    def __init__(self, *args, **kwargs):
+        """Initializes Place objects"""
+        super().__init__(*args, **kwargs)
 
     if getenv("HBNB_TYPE_STORAGE") != "db":
+        @property
+        def reviews(self):
+            """This is the property setter for reviews
+            Return:
+                all object in list
+            """
+            get_all = models.storage.all("Review").values()
+            return [obj for obj in get_all if obj.place_id == self.id]
+
         @property
         def amenities(self):
             """This is the property setter for reviews
