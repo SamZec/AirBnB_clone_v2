@@ -4,6 +4,7 @@
 from flask import Flask
 from flask import render_template
 from models import storage
+from models.state import State
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -58,11 +59,11 @@ def number_odd_or_even(n):
     return render_template('6-number_odd_or_even.html', n=string)
 
 
-@app.route("/states_list")
+@app.route("/states_list", strict_slashes=False)
 def states_list():
     """prints states"""
     all_states_list = []
-    all_states_dict = storage.all("State")
+    all_states_dict = storage.all(State)
     for key, value in all_states_dict.items():
         all_states_list.append(value)
     return render_template('7-states_list.html', objects_list=all_states_list)
